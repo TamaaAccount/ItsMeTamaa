@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kirim Pesan</title>
+</head>
+<body>
+  <h2>Kirim Pesan ke MongoDB</h2>
+  <form id="form">
+    <input type="text" id="nama" placeholder="Nama"><br><br>
+    <textarea id="pesan" placeholder="Pesan"></textarea><br><br>
+    <button type="submit">Kirim</button>
+  </form>
+
+  <h3>Pesan Terbaru:</h3>
+  <ul id="list"></ul>
+
+  <script>
+    const form = document.getElementById('form');
+    const list = document.getElementById('list');
+
+    async function getData() {
+      const res = await fetch('/api/data');
+      const data = await res.json();
+      list.innerHTML = '';
+      data.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.nama}: ${item.pesan}`;
+        list.appendChild(li);
+      });
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nama = document.getElementById('name').value;
+      const pesan = document.getElementById('messages').value;
+
+      await fetch('/api/data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nama, pesan })
+      });
+
+      form.reset();
+      getData();
+    });
+
+    getData();
+  </script>
+</body>
+</html>
