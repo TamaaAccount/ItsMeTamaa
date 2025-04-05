@@ -1,51 +1,36 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Kirim Pesan</title>
+  <title>Shortlink Generator</title>
 </head>
 <body>
-  <h2>Kirim Pesan ke MongoDB</h2>
+  <h2>Buat Shortlink</h2>
   <form id="form">
-    <input type="text" id="nama" placeholder="Nama"><br><br>
-    <textarea id="pesan" placeholder="Pesan"></textarea><br><br>
-    <button type="submit">Kirim</button>
+    <input type="url" id="url" placeholder="https://contoh.com" required>
+    <button type="submit">Shorten</button>
   </form>
 
-  <h3>Pesan Terbaru:</h3>
-  <ul id="list"></ul>
+  <p id="result"></p>
 
   <script>
     const form = document.getElementById('form');
-    const list = document.getElementById('list');
+    const result = document.getElementById('result');
 
-    async function getData() {
-      const res = await fetch('/api/data');
-      const data = await res.json();
-      list.innerHTML = '';
-      data.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = `${item.nama}: ${item.pesan}`;
-        list.appendChild(li);
-      });
-    }
-
-    form.addEventListener('submit', async (e) => {
+    form.onsubmit = async (e) => {
       e.preventDefault();
-      const nama = document.getElementById('name').value;
-      const pesan = document.getElementById('messages').value;
+      const url = document.getElementById('url').value;
 
-      await fetch('/api/data', {
+      const res = await fetch('/api/shorten', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nama, pesan })
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ url })
       });
 
-      form.reset();
-      getData();
-    });
-
-    getData();
+      const data = await res.json();
+      result.innerHTML = data.shortlink
+        ? `Shortlink: <a href="${data.shortlink}">${data.shortlink}</a>`
+        : `Error: ${data.error}`;
+    };
   </script>
 </body>
 </html>
